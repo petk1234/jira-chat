@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 List<User> usersFromJson(String jsonString) {
-  return jsonDecode(jsonString)
-      .map<User>((user) => User.fromJson(user))
-      .toList();
+    return jsonDecode(jsonString)
+        .map<User>((user) => User.fromJson(user))
+        .toList();
 }
 
 class User {

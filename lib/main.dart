@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:jira_project/controllers/auth.dart';
-import 'package:jira_project/data/jira_service.dart';
-import 'package:jira_project/domain/repository/jira_repository.dart';
+import 'package:jira_project/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:jira_project/features/auth/data/services/auth_service_impl.dart';
+import 'package:jira_project/features/auth/presentation/controllers/auth.dart';
 import 'package:jira_project/routes.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +21,10 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(
               create: (context) => AuthState(
-                  jiraRepository: JiraRepository(jiraService: JiraService())))
+                  authRepository: AuthRepositoryImpl(authService: AuthServiceImpl()
+                  )
+              )
+          )
         ],
         builder: (context, child) => Consumer<AuthState>(
             builder: (context, state, child) => MaterialApp(
@@ -31,7 +34,6 @@ class MyApp extends StatelessWidget {
                         ColorScheme.fromSeed(seedColor: Colors.deepPurple),
                     useMaterial3: true,
                   ),
-                  // home: const MyHomePage(title: 'Flutter Demo Home Page'),
                   initialRoute: '/login',
                   routes: routes,
                 )));

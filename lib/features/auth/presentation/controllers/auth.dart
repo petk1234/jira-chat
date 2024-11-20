@@ -1,19 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jira_project/data/models/user.dart';
-import 'package:jira_project/domain/repository/jira_repository.dart';
+import 'package:jira_project/features/auth/data/models/user.dart';
+import 'package:jira_project/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthState extends ChangeNotifier {
   User? user;
   AuthenticationStatus authStatus = AuthenticationStatus.unauthenticated;
-  final JiraRepository jiraRepository;
-  AuthState({required this.jiraRepository});
+  final AuthRepository authRepository;
+  AuthState({required this.authRepository});
 
   authorizeUser(String email, BuildContext context) async {
     try {
       authStatus = AuthenticationStatus.inProgress;
       notifyListeners();
-      final authorizedUser = await jiraRepository.authorizeJiraUser(email);
+      final authorizedUser = await authRepository.authorizeJiraUser(email);
       if (authorizedUser != null && context.mounted) {
         user = authorizedUser;
         authStatus = AuthenticationStatus.authenticated;

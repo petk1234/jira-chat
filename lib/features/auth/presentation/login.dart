@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jira_project/controllers/auth.dart';
+import 'package:jira_project/features/auth/presentation/controllers/auth.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatelessWidget {
-  Login({Key? key}) : super(key: key);
+  Login({super.key});
 
   final TextEditingController emailController = TextEditingController();
 
@@ -16,12 +16,12 @@ class Login extends StatelessWidget {
         title: const Text('Login'),
       ),
       body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 26),
+          padding: const EdgeInsets.symmetric(horizontal: 26),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 controller: emailController,
               ),
               const SizedBox(height: 20),
@@ -33,8 +33,8 @@ class Login extends StatelessWidget {
                             Provider.of<AuthState>(context, listen: false)
                                 .authorizeUser(emailController.text, context);
                           },
-                          child: Text('Login'))
-                      : CircularProgressIndicator())
+                          child: const Text('Login'))
+                      : const CircularProgressIndicator())
             ],
           )),
     );

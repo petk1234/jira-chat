@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:jira_project/data/models/user.dart';
+import 'package:jira_project/features/auth/data/models/user.dart';
 
 List<JiraComment> commentsFromJson(String jsonString, String issueId) {
   try{

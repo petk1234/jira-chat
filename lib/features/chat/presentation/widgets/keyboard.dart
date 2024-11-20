@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jira_project/controllers/jira.dart';
+import 'package:jira_project/features/chat/presentation/controllers/jira.dart';
 import 'package:provider/provider.dart';
 
 class Keyboard extends StatelessWidget {
-  final FocusNode? inputNode;
   final TextEditingController controller;
-  Keyboard({Key? key, this.inputNode, required this.controller})
-      : super(key: key);
+  const Keyboard({super.key, required this.controller});
 
   _handleSend(BuildContext context, bool isCommentSelected) => () async {
         try {
@@ -41,18 +39,16 @@ class Keyboard extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'Type Your Message',
                 ),
-                focusNode: inputNode,
+                focusNode: Provider.of<JiraState>(context, listen: false).inputNode,
                 controller: controller,
               ),
             ),
             CupertinoButton(
-              child:
-                  Provider.of<JiraState>(context, listen: true).loadingType ==
-                          LoadingType.loading
+              child: Provider.of<JiraState>(context, listen: true).loadingType == LoadingType.loading
                       ? CircularProgressIndicator()
                       : Icon(CupertinoIcons.paperplane),
               onPressed: _handleSend(context, isCommentSelected),

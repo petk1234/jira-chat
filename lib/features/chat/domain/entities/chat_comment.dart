@@ -1,7 +1,9 @@
-import 'package:jira_project/data/models/jira_comment.dart';
-import 'package:jira_project/data/models/jira_issue.dart';
-import 'package:jira_project/data/models/jira_project.dart';
-import 'package:jira_project/data/models/user.dart';
+
+
+import 'package:jira_project/features/auth/data/models/user.dart';
+import 'package:jira_project/features/chat/data/models/jira_comment.dart';
+import 'package:jira_project/features/chat/data/models/jira_issue.dart';
+import 'package:jira_project/features/chat/data/models/jira_project.dart';
 
 class ChatComment {
   final JiraProject project;

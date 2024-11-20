@@ -2,20 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jira_project/controllers/auth.dart';
-import 'package:jira_project/controllers/jira.dart';
-import 'package:jira_project/domain/entities/chat_comment.dart';
-import 'package:jira_project/features/chat/widgets/chat_list.dart';
-import 'package:jira_project/features/chat/widgets/keyboard.dart';
+import 'package:jira_project/features/auth/presentation/controllers/auth.dart';
+import 'package:jira_project/features/chat/domain/entities/chat_comment.dart';
+import 'package:jira_project/features/chat/presentation/controllers/jira.dart';
+import 'package:jira_project/features/chat/presentation/widgets/chat_list.dart';
+import 'package:jira_project/features/chat/presentation/widgets/keyboard.dart';
 import 'package:provider/provider.dart';
 
 class Chat extends StatefulWidget {
+  const Chat({super.key});
+
   @override
-  _ChatState createState() => _ChatState();
+  State<Chat> createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  final FocusNode inputNode = FocusNode();
   final TextEditingController controller = TextEditingController();
   Future<List<ChatComment>?>? _future;
   Timer? _timer;
@@ -54,39 +55,37 @@ class _ChatState extends State<Chat> {
     super.dispose();
   }
 
-  void openKeyboard(BuildContext context) {
-    FocusScope.of(context).requestFocus(inputNode);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: Text('Chat'),
+          title: const Text('Chat'),
         ),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           child: FutureBuilder(
             future: _future,
             builder: (context, snapshot) {
               return Column(children: [
-                if ((snapshot.connectionState == ConnectionState.waiting &&
+                if (!snapshot.hasData)
+                  const Expanded(child:
+                    Column(children: [
+                      Expanded(child:
+                        Center(child: CircularProgressIndicator())
+                      ),
+                    ])
+                  )
+
+                else if ((snapshot.connectionState == ConnectionState.waiting &&
                         Provider.of<JiraState>(context, listen: true)
                             .chatComments
                             .isNotEmpty) ||
-                    snapshot.connectionState == ConnectionState.done) ...[
-                  ChatList(openKeyBoard: openKeyboard),
-                ] else if (!snapshot.hasData)
-                  Expanded(
-                      child: Column(children: [
-                    Expanded(child: Center(child: CircularProgressIndicator())),
-                  ]))
-                else ...[
-                  ChatList(openKeyBoard: openKeyboard),
-                ],
-                Keyboard(inputNode: inputNode, controller: controller),
+                    snapshot.connectionState == ConnectionState.done)
+                  ...[const ChatList()],
+
+                Keyboard(controller: controller),
               ]);
             },
           ),

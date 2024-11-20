@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:jira_project/data/models/user.dart';
-import 'package:jira_project/domain/entities/chat_comment.dart';
-import 'package:jira_project/domain/repository/jira_repository.dart';
 import 'package:collection/collection.dart';
+import 'package:jira_project/features/auth/data/models/user.dart';
+import 'package:jira_project/features/chat/domain/entities/chat_comment.dart';
+import 'package:jira_project/features/chat/domain/use_cases/get_all_users.dart';
+import 'package:jira_project/features/chat/domain/use_cases/get_chat_comments.dart';
+import 'package:jira_project/features/chat/domain/use_cases/post_comment.dart';
 
 class JiraState extends ChangeNotifier {
-  final JiraRepository jiraRepository;
-  JiraState({required this.jiraRepository});
+  final GetAllUsers _getAllUsersUseCase;
+  final GetChatComments _getChatCommentsUseCase;
+  final PostComment _postCommentUseCase;
+  final FocusNode inputNode = FocusNode();
+
+  JiraState({required GetAllUsers getAllUsersUseCase, required GetChatComments getChatCommentsUseCase, required PostComment postCommentUseCase}): _getAllUsersUseCase = getAllUsersUseCase, _getChatCommentsUseCase = getChatCommentsUseCase, _postCommentUseCase = postCommentUseCase;
 
   List<ChatComment> chatComments = [];
   LoadingType loadingType = LoadingType.initial;
@@ -16,11 +22,9 @@ class JiraState extends ChangeNotifier {
   Future<List<ChatComment>?> getChatComments({String? email}) async {
     try {
       loadingType = LoadingType.loading;
-      users = await jiraRepository.getAllUsers() ?? [];
+      users = await _getAllUsersUseCase() ?? [];
       notifyListeners();
-      chatComments = await jiraRepository.prepareChatComments(
-              email: email, users: users) ??
-          [];
+      chatComments = await _getChatCommentsUseCase(params: GetChatCommentsParams(email: email, users: users)) ?? [];
       loadingType = LoadingType.loaded;
       notifyListeners();
       return chatComments;
@@ -40,9 +44,9 @@ class JiraState extends ChangeNotifier {
     loadingType = LoadingType.loading;
     notifyListeners();
     final names = _splitOnNamedTags(text);
-    final updText = enableCommentTags(names, text);
+    final updText = _enableCommentTags(names, text);
     final newComment =
-        await jiraRepository.postComment(selectedComment!, updText ?? text);
+        await _postCommentUseCase(params: PostCommentParams(commentToRespond: selectedComment!, text: updText ?? text));
     if (newComment != null) {
       final refreshedComments = await getChatComments();
       chatComments = refreshedComments ?? chatComments;
@@ -50,6 +54,10 @@ class JiraState extends ChangeNotifier {
       selectedComment = null;
       notifyListeners();
     }
+  }
+
+  void openKeyboard(BuildContext context) {
+    FocusScope.of(context).requestFocus(inputNode);
   }
 
   List<String> _splitOnNamedTags(String text) {
@@ -73,7 +81,7 @@ class JiraState extends ChangeNotifier {
     return [];
   }
 
-  enableCommentTags(List<String> names, String text) {
+  _enableCommentTags(List<String> names, String text) {
     String? updText;
     if (names.isNotEmpty) {
       final List<User?> taggedUsers = names.map((name) {
